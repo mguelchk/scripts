@@ -175,3 +175,35 @@ UNLOCK TABLES;
 -- Table structure for table `USUARIOS`
 --
 
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `crearUsuario`(IN paUsuario varchar(100),IN paContrasenia varchar(200),IN paCorreo varchar(100),
+IN paTelefono varchar(50),OUT paCodigoError INT,OUT paMensaje varchar(100),OUT paIdUsuario INT)
+BEGIN
+    DECLARE sqlEstado int;
+    DECLARE codigoError int;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		GET CURRENT DIAGNOSTICS CONDITION 1 
+        sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
+        IF sqlEstado IS NOT NULL THEN 
+			SET paCodigoError = -1;
+            SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
+		end if;
+			
+		ROLLBACK;
+	END;
+	START TRANSACTION;
+		INSERT INTO 
+		`admin_360`.`USUARIOS` (`usuario`, `password`, `correo`, `telefono`, `active`) 
+		VALUES 
+			(paUsuario, paContrasenia, paCorreo, paTelefono, 1);
+            
+		SET paIdUsuario = last_insert_id(); 
+		INSERT INTO `admin_360`.`USERS_ROLES` (`id_usuario`, `id_rol`) VALUES (paIdUsuario, '2');
+
+		
+	COMMIT WORK;
+
+END ;;
+DELIMITER ;
+
