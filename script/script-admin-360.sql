@@ -182,28 +182,83 @@ BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
-		INSERT INTO 
-		`admin_360`.`USUARIOS` (`usuario`, `password`, `correo`, `telefono`, `active`) 
-		VALUES 
-			(paUsuario, paContrasenia, paCorreo, paTelefono, 1);
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    INSERT INTO 
+    `admin_360`.`USUARIOS` (`usuario`, `password`, `correo`, `telefono`, `active`,`recover`) 
+    VALUES 
+      (paUsuario, paContrasenia, paCorreo, paTelefono, 1, 0);
             
-		SET paIdUsuario = last_insert_id(); 
-		INSERT INTO `admin_360`.`USERS_ROLES` (`id_usuario`, `id_rol`) VALUES (paIdUsuario, '2');
+    SET paIdUsuario = last_insert_id(); 
+    INSERT INTO `admin_360`.`USERS_ROLES` (`id_usuario`, `id_rol`) VALUES (paIdUsuario, '2');
 
-		
-	COMMIT WORK;
+    
+  COMMIT WORK;
 
-END ;;
+END
 DELIMITER ;
 
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarPasswordTmp`(IN paIdUsuario INT ,IN paIdContraseniaTemporal varchar(200),
+OUT paCodigoError INT,OUT paMensaje varchar(100))
+BEGIN
+    DECLARE sqlEstado int;
+    DECLARE codigoError int;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
+        sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
+        IF sqlEstado IS NOT NULL THEN 
+      SET paCodigoError = -1;
+            SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    UPDATE `admin_360`.`USUARIOS` 
+        SET  password = paIdContraseniaTemporal, recover = 1
+        WHERE id_usuario  = paIdUsuario; 
+  COMMIT WORK;
+
+END
+END
+DELIMITER ;
+
+
+
+DELIMITER ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarPassword`(IN paIdUsuario INT ,IN paIdContrasenia varchar(200),
+OUT paCodigoError INT,OUT paMensaje varchar(100))
+BEGIN
+    DECLARE sqlEstado int;
+    DECLARE codigoError int;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
+        sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
+        IF sqlEstado IS NOT NULL THEN 
+      SET paCodigoError = -1;
+            SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    UPDATE `admin_360`.`USUARIOS` 
+        SET  password = paIdContrasenia, recover = 0
+        WHERE id_usuario  = paIdUsuario; 
+  COMMIT WORK;
+
+END
+
+DELIMITER ;
