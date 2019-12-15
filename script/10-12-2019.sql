@@ -2,8 +2,8 @@
 --
 -- Host: localhost    Database: admin_360
 -- ------------------------------------------------------
--- Server version	8.0.17
-
+-- Server version 8.0.17
+use admin_360;
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -338,27 +338,27 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarPassword`(IN paIdUsuario INT ,IN paIdContrasenia varchar(200),
+CREATE  PROCEDURE `actualizarPassword`(IN paIdUsuario INT ,IN paIdContrasenia varchar(200),
 OUT paCodigoError INT,OUT paMensaje varchar(100))
 BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
-		UPDATE `admin_360`.`USUARIOS` 
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    UPDATE `admin_360`.`USUARIOS` 
         SET  password = paIdContrasenia, recover = 0
         WHERE id_usuario  = paIdUsuario; 
-	COMMIT WORK;
+  COMMIT WORK;
 
 END ;;
 DELIMITER ;
@@ -376,27 +376,27 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarPasswordTmp`(IN paIdUsuario INT ,IN paIdContraseniaTemporal varchar(200),
+CREATE  PROCEDURE `actualizarPasswordTmp`(IN paIdUsuario INT ,IN paIdContraseniaTemporal varchar(200),
 OUT paCodigoError INT,OUT paMensaje varchar(100))
 BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
-		UPDATE `admin_360`.`USUARIOS` 
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    UPDATE `admin_360`.`USUARIOS` 
         SET  password = paIdContraseniaTemporal, recover = 1
         WHERE id_usuario  = paIdUsuario; 
-	COMMIT WORK;
+  COMMIT WORK;
 
 END ;;
 DELIMITER ;
@@ -414,35 +414,35 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearActualizarArea`(IN paIdArea INT,IN paNombre varchar(200),IN paDescripcion varchar(100),OUT paCodigoError INT,OUT paMensaje varchar(100),OUT paIdAreaOut INT)
+CREATE  PROCEDURE `crearActualizarArea`(IN paIdArea INT,IN paNombre varchar(200),IN paDescripcion varchar(100),OUT paCodigoError INT,OUT paMensaje varchar(100),OUT paIdAreaOut INT)
 BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE idArea int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
     
     
     IF paIdArea IS NOT NULL THEN
         SELECT id_area into idArea  FROM admin_360.AREAS WHERE  id_area = paIdArea AND activo = 1 ;
-		UPDATE `admin_360`.`AREAS` SET `nombre` = paNombre, `descripcion` = paDescripcion WHERE `id_area` = paIdArea;
+    UPDATE `admin_360`.`AREAS` SET `nombre` = paNombre, `descripcion` = paDescripcion WHERE `id_area` = paIdArea;
         SET paIdAreaOut = idArea;
-	ELSE 
-		INSERT INTO `admin_360`.`AREAS` (`nombre`, `descripcion`, `activo`) VALUES (paNombre, paDescripcion, '1');
+  ELSE 
+    INSERT INTO `admin_360`.`AREAS` (`nombre`, `descripcion`, `activo`) VALUES (paNombre, paDescripcion, '1');
         SET paIdAreaOut = last_insert_id(); 
-	END IF;
-		
-	COMMIT WORK;
+  END IF;
+    
+  COMMIT WORK;
 
 END ;;
 DELIMITER ;
@@ -460,28 +460,28 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearPostulacion`(IN paIdVacante INT,IN paIdUsuario INT,OUT paCodigoError INT,OUT paMensaje varchar(1000),OUT paIdPostulacion INT)
+CREATE  PROCEDURE `crearPostulacion`(IN paIdVacante INT,IN paIdUsuario INT,OUT paCodigoError INT,OUT paMensaje varchar(1000),OUT paIdPostulacion INT)
 BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
     
-		INSERT INTO `admin_360`.`VACANTES_USUARIOS` (`id_vacante`, `id_usuario`) VALUES (paIdVacante, paIdUsuario);
+    INSERT INTO `admin_360`.`VACANTES_USUARIOS` (`id_vacante`, `id_usuario`) VALUES (paIdVacante, paIdUsuario);
 
-		SET paIdPostulacion = last_insert_id(); 
-		
-	COMMIT WORK;
+    SET paIdPostulacion = last_insert_id(); 
+    
+  COMMIT WORK;
 
 END ;;
 DELIMITER ;
@@ -499,33 +499,33 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearUsuario`(IN paUsuario varchar(100),IN paContrasenia varchar(200),IN paCorreo varchar(100),
+CREATE  PROCEDURE `crearUsuario`(IN paUsuario varchar(100),IN paContrasenia varchar(200),IN paCorreo varchar(100),
 IN paTelefono varchar(50),OUT paCodigoError INT,OUT paMensaje varchar(100),OUT paIdUsuario INT)
 BEGIN
     DECLARE sqlEstado int;
     DECLARE codigoError int;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
-	BEGIN
-		GET CURRENT DIAGNOSTICS CONDITION 1 
+  BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 
         sqlEstado = RETURNED_SQLSTATE,codigoError = MYSQL_ERRNO, paMensaje = MESSAGE_TEXT;
         IF sqlEstado IS NOT NULL THEN 
-			SET paCodigoError = -1;
+      SET paCodigoError = -1;
             SET paMensaje = CONCAT(sqlEstado,' - ',codigoError,' - ',paMensaje);
-		end if;
-			
-		ROLLBACK;
-	END;
-	START TRANSACTION;
-		INSERT INTO 
-		`admin_360`.`USUARIOS` (`usuario`, `password`, `correo`, `telefono`, `active`,`recover`) 
-		VALUES 
-			(paUsuario, paContrasenia, paCorreo, paTelefono, 1, 0);
+    end if;
+      
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+    INSERT INTO 
+    `admin_360`.`USUARIOS` (`usuario`, `password`, `correo`, `telefono`, `active`,`recover`) 
+    VALUES 
+      (paUsuario, paContrasenia, paCorreo, paTelefono, 1, 0);
             
-		SET paIdUsuario = last_insert_id(); 
-		INSERT INTO `admin_360`.`USERS_ROLES` (`id_usuario`, `id_rol`) VALUES (paIdUsuario, '2');
+    SET paIdUsuario = last_insert_id(); 
+    INSERT INTO `admin_360`.`USERS_ROLES` (`id_usuario`, `id_rol`) VALUES (paIdUsuario, '2');
 
-		
-	COMMIT WORK;
+    
+  COMMIT WORK;
 
 END ;;
 DELIMITER ;
@@ -543,7 +543,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insertarVacantes`(in id int)
+CREATE  PROCEDURE `insertarVacantes`(in id int)
 BEGIN
 DECLARE counter BIGINT DEFAULT 0;
 DECLARE nombreArea varchar(500);
